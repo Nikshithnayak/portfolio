@@ -201,10 +201,14 @@ function asciiRendererMode() {
   return 'legacy';
 }
 
+function isMobilePerformanceMode() {
+  return window.matchMedia?.('(max-width: 720px), (pointer: coarse)').matches === true;
+}
+
 function initFlowerParticleInteraction() {
   const card = document.querySelector('[data-id="palette-reference-card"]');
   const imageLayer = card?.querySelector('.ascii-palette-image-background');
-  if (!card || !imageLayer || window.matchMedia?.('(pointer: coarse)').matches) return;
+  if (!card || !imageLayer || isMobilePerformanceMode()) return;
 
   const canvas = document.createElement('canvas');
   canvas.className = 'ascii-flower-particle-canvas';
@@ -350,6 +354,7 @@ window.addEventListener('DOMContentLoaded', () => {
     perfProbe: perfProbe.enabled,
     perfAsciiMetricsMode: perfProbe.asciiMetricsMode,
     showControls: false,
+    mobilePerformance: isMobilePerformanceMode(),
     visualizerOnly: false,
     productionTrackId: '',
     productionTrackIds: [],
@@ -357,6 +362,7 @@ window.addEventListener('DOMContentLoaded', () => {
     includeSynthFallback: false,
     youtubeInitialAutoplay: false,
     disableMusic: true,
+    disableWebsiteSlideshow: true,
     assetBase: '',
     keyboard: false,
     ignoreClickSelector: '[data-ui-interactive], [data-no-bg-click], button, a, input, textarea, select'
@@ -373,12 +379,19 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-id="website-preview-1"], [data-id="website-preview-2"]').forEach((card) => {
     const surface = card.querySelector('.ascii-website-preview-surface');
     if (card.dataset.id === 'website-preview-1') return;
+    if (card.querySelector('[data-cobe-globe]')) return;
     if (surface) {
-      surface.replaceChildren(document.createTextNode('UPDATING SOON'));
-      surface.classList.add('ascii-website-preview-updating');
-      surface.setAttribute('aria-label', 'Updating soon');
+      surface.replaceChildren();
+      surface.classList.remove('ascii-website-slideshow', 'ascii-website-preview-updating');
+      surface.classList.add('ascii-website-globe-surface');
+      surface.setAttribute('aria-label', 'Interactive globe');
+      const canvas = document.createElement('canvas');
+      canvas.className = 'ascii-website-globe';
+      canvas.dataset.cobeGlobe = '';
+      canvas.setAttribute('aria-label', 'Interactive globe');
+      surface.appendChild(canvas);
     }
-    card.setAttribute('aria-label', 'Updating soon');
+    card.setAttribute('aria-label', 'Interactive globe');
   });
   markPaletteProjectRevealsUpdating();
 

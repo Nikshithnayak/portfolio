@@ -1776,6 +1776,34 @@ body.ascii-contact-modal-open .ascii-contact-cta-wrap {
   letter-spacing: .08em;
 }
 
+.ascii-website-globe-surface {
+  display: grid;
+  place-items: center;
+  background: #000;
+  pointer-events: auto;
+}
+
+.ascii-website-globe {
+  display: block;
+  width: auto !important;
+  height: calc(var(--ascii-project-card-height, 235px) - 20px) !important;
+  max-width: 100%;
+  max-height: calc(var(--ascii-project-card-height, 235px) - 20px);
+  aspect-ratio: 1;
+  opacity: 0;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity .5s ease;
+}
+
+.ascii-website-globe.is-ready {
+  opacity: 1;
+}
+
+.ascii-website-globe:active {
+  cursor: grabbing;
+}
+
 .ascii-shader-frame[data-id="website-preview-1"] .ascii-website-preview-surface {
   inset: 0;
   display: flex;

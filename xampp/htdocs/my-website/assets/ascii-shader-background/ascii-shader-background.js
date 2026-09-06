@@ -4179,7 +4179,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;vec2 m=(u_mouse-.5*u_res)
       this.staticFrameRendered = false;
       this.needsStaticRender = true;
       this.visibilityObserver = null;
-      this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || options.mobilePerformance === true;
       if (!this.card || !this.canvas) return;
       this.pointerMoveHandler = (event) => this.handlePointerMove(event);
       this.pointerDownHandler = (event) => this.handlePointerDown(event);
@@ -6313,9 +6313,10 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;vec2 m=(u_mouse-.5*u_res)
       }
       if (!this.workerRenderer && !this.ctx) this.ctx = canvas.getContext('2d', { alpha: false });
       canvas.dataset.asciiRenderer = this.workerRenderer ? this.rendererMode : 'legacy';
-      this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.mobilePerformance = options.mobilePerformance === true;
+      this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || this.mobilePerformance;
       this.mobile = window.matchMedia('(max-width:720px),(pointer:coarse)').matches;
-      this.cfg = { fontSize:this.mobile?13:14, cellW:this.mobile?11:12, cellH:this.mobile?17:18, visible:this.reduced?.26:.34, hoverRadius:this.mobile?112:150, hoverDecay:this.reduced?.93:.88, dprCap:this.mobile?1.5:2, maxShapes:5 };
+      this.cfg = { fontSize:this.mobile?14:14, cellW:this.mobile?12:12, cellH:this.mobile?18:18, visible:this.reduced?.26:.34, hoverRadius:this.mobile?112:150, hoverDecay:this.reduced?.93:.88, dprCap:this.mobilePerformance?1:this.mobile?1.5:2, maxShapes:this.mobilePerformance?2:5 };
       this.w=0; this.h=0; this.worldH=0; this.scrollY=0; this.dpr=1; this.cols=0; this.rows=0;
       this.cells=[]; this.cellRows=[]; this.shapes=[]; this.clickGridFills=[]; this.musicGridFills=[]; this.musicRipples=[]; this.detailRipples=[]; this.clickRipples=[];
       this.lastBeatSerial=0; this.lastDetailSerial=0; this.lastMusicGridSerial=0; this.clicks=[]; this.lastTriple=-Infinity; this.lastSpam=-Infinity; this.lastClickRipple=-Infinity;
@@ -7324,7 +7325,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;vec2 m=(u_mouse-.5*u_res)
       const signal = this.abort.signal;
       const apiUrl = this.options.statsApiUrl || '/api/profile-stats';
       let data = this.emptyData('fallback-unavailable');
-      const shouldFetchApi = !!this.options.statsApiUrl || window.location.protocol !== 'file:';
+      const shouldFetchApi = !!this.options.statsApiUrl;
       if (shouldFetchApi) {
         try {
           data = await this.fetchJson(apiUrl, signal);
@@ -7535,7 +7536,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;vec2 m=(u_mouse-.5*u_res)
         : this.options.qqqMarketQuoteApiUrl;
       const apiUrl = configuredUrl || quote.apiUrl;
       let data = null;
-      const shouldFetchApi = !!configuredUrl || window.location.protocol !== 'file:';
+      const shouldFetchApi = !!configuredUrl;
       if (shouldFetchApi) {
         try {
           data = await this.fetchJson(apiUrl, signal);
@@ -10229,6 +10230,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;vec2 m=(u_mouse-.5*u_res)
   }
 
   function initWebsiteSlideshow(root, options = {}) {
+    if (options.disableWebsiteSlideshow === true) return { setPaused() {}, destroy() {} };
     const slideshows = Array.from(root.querySelectorAll('.ascii-website-slideshow'));
     if (!slideshows.length) return { destroy() {} };
 
